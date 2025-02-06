@@ -60,6 +60,7 @@ import mss
 import argparse
 
 from google import genai
+from dotenv import load_dotenv
 
 if sys.version_info < (3, 11, 0):
     import taskgroup, exceptiongroup
@@ -77,7 +78,15 @@ MODEL = "models/gemini-2.0-flash-exp"
 
 DEFAULT_MODE = "camera"
 
-client = genai.Client(http_options={"api_version": "v1alpha"})
+# Load environment variables from .env file
+load_dotenv()
+
+# Set the GOOGLE_API_KEY from the environment variable
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise ValueError("GOOGLE_API_KEY environment variable is not set in .env file")
+
+client = genai.Client(api_key=GOOGLE_API_KEY, http_options={"api_version": "v1alpha"})
 
 # While Gemini 2.0 Flash is in experimental preview mode, only one of AUDIO or
 # TEXT may be passed here.
