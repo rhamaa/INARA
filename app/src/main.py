@@ -6,6 +6,12 @@ import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+# Warna Palet Kustom
+COLOR_BASE = "#F5EEDC"      # Warna dasar/background
+COLOR_PRIMARY = "#27548A"   # Warna utama
+COLOR_SECONDARY = "#183B4E" # Warna sekunder
+COLOR_ACCENT = "#DDA853"    # Warna aksen
+
 # Handler untuk pemantauan perubahan file
 class MarkdownFileHandler(FileSystemEventHandler):
     def __init__(self, markdown_component, md_file_path):
@@ -33,6 +39,7 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.window_width = 1000
     page.window_height = 700
+    page.bgcolor = COLOR_BASE  # Set background color
     
     # Path ke file Markdown, relatif terhadap lokasi main.py
     md_file_path = os.path.join(os.path.dirname(__file__), "md", "main.md")
@@ -94,22 +101,24 @@ def main(page: ft.Page):
         ]),
         padding=10,
         expand=True,
-        border=ft.border.all(2, ft.colors.BLACK),
+        bgcolor="white",
+        border=ft.border.all(2, COLOR_PRIMARY),
         border_radius=10,
     )
     
     # Date dan Time widgets
-    date_text = ft.Text("", size=16, weight=ft.FontWeight.BOLD)
-    time_text = ft.Text("", size=16, weight=ft.FontWeight.BOLD)
+    date_text = ft.Text("", size=16, weight=ft.FontWeight.BOLD, color=COLOR_BASE)
+    time_text = ft.Text("", size=16, weight=ft.FontWeight.BOLD, color=COLOR_BASE)
     
     date_container = ft.Container(
         content=ft.Column([
-            ft.Text("Date", size=18, weight=ft.FontWeight.BOLD),
+            ft.Text("Date", size=18, weight=ft.FontWeight.BOLD, color=COLOR_BASE),
             date_text
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         width=150,
         height=70,
-        border=ft.border.all(2, ft.colors.BLACK),
+        bgcolor=COLOR_PRIMARY,
+        border=ft.border.all(2, COLOR_SECONDARY),
         border_radius=10,
         padding=5,
         alignment=ft.alignment.center
@@ -117,12 +126,13 @@ def main(page: ft.Page):
     
     time_container = ft.Container(
         content=ft.Column([
-            ft.Text("Time", size=18, weight=ft.FontWeight.BOLD),
+            ft.Text("Time", size=18, weight=ft.FontWeight.BOLD, color=COLOR_BASE),
             time_text
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         width=100,
         height=70,
-        border=ft.border.all(2, ft.colors.BLACK),
+        bgcolor=COLOR_PRIMARY,
+        border=ft.border.all(2, COLOR_SECONDARY),
         border_radius=10,
         padding=5,
         alignment=ft.alignment.center
@@ -140,6 +150,7 @@ def main(page: ft.Page):
     carousel_text = ft.Text(
         carousel_items[current_carousel_index],
         size=16,
+        color=COLOR_PRIMARY,
         text_align=ft.TextAlign.CENTER
     )
     
@@ -160,7 +171,8 @@ def main(page: ft.Page):
             carousel_text,
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=30),
         height=300,
-        border=ft.border.all(2, ft.colors.BLACK),
+        bgcolor=COLOR_BASE,
+        border=ft.border.all(2, COLOR_ACCENT),
         border_radius=10,
         padding=10,
         margin=ft.margin.only(top=10),
@@ -173,22 +185,27 @@ def main(page: ft.Page):
         hint_text="Tulis sesuatu...",
         multiline=True,
         min_lines=3,
-        on_submit=add_text_to_markdown
+        on_submit=add_text_to_markdown,
+        border_color=COLOR_PRIMARY,
+        label_style=ft.TextStyle(color=COLOR_PRIMARY)
     )
     
     command_container = ft.Container(
         content=ft.Column([
-            ft.Text("Markdown Command", size=18, weight=ft.FontWeight.BOLD),
+            ft.Text("Markdown Command", size=18, weight=ft.FontWeight.BOLD, color=COLOR_PRIMARY),
             command_input,
             ft.ElevatedButton("Tambahkan ke Canvas", 
                               on_click=add_text_to_markdown,
                               width=200,
                               style=ft.ButtonStyle(
-                                  shape=ft.RoundedRectangleBorder(radius=10)
+                                  shape=ft.RoundedRectangleBorder(radius=10),
+                                  color=COLOR_BASE,
+                                  bgcolor=COLOR_ACCENT
                               ))
         ]),
         height=200,
-        border=ft.border.all(2, ft.colors.BLACK),
+        bgcolor=COLOR_BASE,
+        border=ft.border.all(2, COLOR_PRIMARY),
         border_radius=10,
         padding=10,
         margin=ft.margin.only(top=10)
@@ -217,7 +234,7 @@ def main(page: ft.Page):
     page.add(
         ft.Container(
             content=main_layout,
-            border=ft.border.all(3, ft.colors.BLACK),
+            border=ft.border.all(3, COLOR_SECONDARY),
             border_radius=15,
             padding=10,
             expand=True
