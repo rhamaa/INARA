@@ -90,11 +90,6 @@ def main(page: ft.Page):
     # Markdown canvas dengan judul
     markdown_canvas = ft.Container(
         content=ft.Column([
-            ft.Text("Markdown Interactive Canvas", 
-                   size=18, 
-                   weight=ft.FontWeight.BOLD,
-                   italic=True,
-                   rotate=ft.transform.Rotate(-20, alignment=ft.alignment.center)),
             markdown_view
         ]),
         padding=10,
@@ -162,17 +157,7 @@ def main(page: ft.Page):
     
     carousel_container = ft.Container(
         content=ft.Column([
-            ft.Text("Carouser Adds", 
-                   size=18, 
-                   weight=ft.FontWeight.BOLD,
-                   italic=True,
-                   rotate=ft.transform.Rotate(-20, alignment=ft.alignment.center)),
             carousel_text,
-            ft.Row([
-                ft.Text("o", size=20),
-                ft.Text("o", size=20),
-                ft.Text("o", size=20),
-            ], alignment=ft.MainAxisAlignment.CENTER)
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=30),
         height=300,
         border=ft.border.all(2, ft.colors.BLACK),
