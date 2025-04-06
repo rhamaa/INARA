@@ -36,3 +36,9 @@ types-python-dateutil==2.9.0.20241206
 typing_extensions==4.13.1
 urllib3==2.3.0
 watchdog==4.0.2
+google-generativeai>=0.3.0
+pypdf>=3.15.1
+langchain>=0.0.267
+faiss-cpu>=1.7.4
+python-dotenv>=1.0.0
+streamlit>=1.25.0
