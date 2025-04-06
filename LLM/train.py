@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# train.py - Local version of document processor for vector embeddings
+# train.py - Local version of document processor for vector embeddings with Markdown support
 
 import os
 import glob
@@ -45,6 +45,13 @@ class DocumentProcessor:
             document = self._process_txt(txt_file)
             documents.append(document)
         
+        # Look for markdown files in the data directory
+        md_files = glob.glob(os.path.join(self.data_dir, "*.md"))
+        
+        for md_file in tqdm(md_files, desc="Processing MDs"):
+            document = self._process_md(md_file)
+            documents.append(document)
+        
         self.documents = documents
         print(f"Total documents processed: {len(documents)}")
         return documents
@@ -60,14 +67,16 @@ class DocumentProcessor:
             return {
                 "id": os.path.basename(file_path),
                 "source": file_path,
-                "text": text
+                "text": text,
+                "type": "pdf"
             }
         except Exception as e:
             print(f"Error processing PDF {file_path}: {str(e)}")
             return {
                 "id": os.path.basename(file_path),
                 "source": file_path,
-                "text": f"Error processing document: {str(e)}"
+                "text": f"Error processing document: {str(e)}",
+                "type": "pdf"
             }
     
     def _process_txt(self, file_path: str) -> Dict[str, Any]:
@@ -79,14 +88,37 @@ class DocumentProcessor:
             return {
                 "id": os.path.basename(file_path),
                 "source": file_path,
-                "text": text
+                "text": text,
+                "type": "txt"
             }
         except Exception as e:
             print(f"Error processing text file {file_path}: {str(e)}")
             return {
                 "id": os.path.basename(file_path),
                 "source": file_path,
-                "text": f"Error processing document: {str(e)}"
+                "text": f"Error processing document: {str(e)}",
+                "type": "txt"
+            }
+    
+    def _process_md(self, file_path: str) -> Dict[str, Any]:
+        """Process a markdown file"""
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                text = f.read()
+            
+            return {
+                "id": os.path.basename(file_path),
+                "source": file_path,
+                "text": text,
+                "type": "md"
+            }
+        except Exception as e:
+            print(f"Error processing markdown file {file_path}: {str(e)}")
+            return {
+                "id": os.path.basename(file_path),
+                "source": file_path,
+                "text": f"Error processing document: {str(e)}",
+                "type": "md"
             }
     
     def _chunk_text(self, text: str, chunk_size: int = 1000) -> List[str]:
@@ -118,6 +150,7 @@ class DocumentProcessor:
                     chunks_info.append({
                         "doc_idx": doc_idx,
                         "doc_id": doc["id"],
+                        "doc_type": doc["type"],
                         "chunk_idx": chunk_idx,
                         "text": chunk
                     })
@@ -187,6 +220,7 @@ def main():
     parser.add_argument("--data-dir", default="data/sample_docs", help="Directory containing documents")
     parser.add_argument("--output", default="data/vector_store", help="Path to save the vector store")
     parser.add_argument("--api-key", help="Google AI API key")
+    parser.add_argument("--chunk-size", type=int, default=1000, help="Size of text chunks for embedding")
     args = parser.parse_args()
     
     # Set up API key from arguments, environment variable, or prompt
@@ -208,6 +242,7 @@ def main():
     print("Process completed! Vector store files are available at:")
     print(f" - {args.output}.index")
     print(f" - {args.output}.pkl")
+    print(f"Document types processed: PDF, TXT, MD")
 
 if __name__ == "__main__":
     main()
