@@ -16,7 +16,6 @@ class ChatManager:
         self, 
         rag_instance: SimpleRAG,
         status_callback: Optional[Callable[[str], None]] = None,
-        result_callback: Optional[Callable[[str], None]] = None
     ):
         """
         Inisialisasi Chat Manager.
@@ -24,11 +23,9 @@ class ChatManager:
         Args:
             rag_instance: Instance RAG yang sudah dibuat
             status_callback: Callback untuk memperbarui status proses
-            result_callback: Callback untuk menerima hasil respons
         """
         self.rag = rag_instance
         self.status_callback = status_callback
-        self.result_callback = result_callback
     
     def process_query(self, query: str) -> str:
         """
@@ -46,11 +43,11 @@ class ChatManager:
                 self.status_callback(f"Memproses query: {query}")
             
             # Gunakan RAG untuk memproses query
+            # RAG akan langsung memperbarui markdown panel
             response = self.rag.process_query(query)
             
-            # Panggil callback hasil jika tersedia
-            if self.result_callback:
-                self.result_callback(response)
+            if self.status_callback:
+                self.status_callback("Query selesai diproses")
             
             return response
         except Exception as e:

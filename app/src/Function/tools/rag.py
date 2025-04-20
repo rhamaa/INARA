@@ -29,13 +29,14 @@ class AppConfig:
 class SimpleRAG:
     """Kelas untuk menangani RAG (Retrieval Augmented Generation)."""
     
-    def __init__(self, vector_store_path: str = AppConfig.VECTOR_STORE_PATH, status_callback: Callable = None):
+    def __init__(self, vector_store_path: str = AppConfig.VECTOR_STORE_PATH, status_callback: Callable = None, markdown_viewer = None):
         """
         Inisialisasi SimpleRAG.
         
         Args:
             vector_store_path: Path ke vector store
             status_callback: Callback untuk memperbarui status
+            markdown_viewer: Instance MarkdownViewer untuk diupdate
         """
         if not RAG_AVAILABLE:
             raise ImportError("Dependensi RAG tidak tersedia. Pastikan google-generativeai dan dotenv terinstal.")
@@ -44,6 +45,7 @@ class SimpleRAG:
         self.embedding_model = AppConfig.EMBEDDING_MODEL
         self.generation_model = AppConfig.GENERATION_MODEL
         self.status_callback = status_callback
+        self.markdown_viewer = markdown_viewer
         
         # Konfigurasi API key
         self.api_key = os.environ.get("GOOGLE_API_KEY")
@@ -69,6 +71,28 @@ class SimpleRAG:
         )
         
         self._update_status("RAG siap digunakan")
+    
+    def set_markdown_viewer(self, markdown_viewer):
+        """
+        Set instance MarkdownViewer yang akan digunakan.
+        
+        Args:
+            markdown_viewer: Instance MarkdownViewer
+        """
+        self.markdown_viewer = markdown_viewer
+    
+    def update_markdown_panel(self, content: str):
+        """
+        Update konten pada markdown panel.
+        
+        Args:
+            content: Konten markdown yang akan ditampilkan
+        """
+        if self.markdown_viewer:
+            self.markdown_viewer.update_content(content)
+            self._update_status(f"Markdown panel diperbarui dengan konten baru")
+        else:
+            self._update_status("Tidak dapat memperbarui markdown panel: MarkdownViewer tidak tersedia")
     
     def _update_status(self, message: str):
         """
@@ -208,11 +232,21 @@ class SimpleRAG:
             results = self.search_documents(query)
             
             if not results:
-                return f"# Tidak ada informasi\n\nMaaf, saya tidak menemukan informasi yang relevan untuk pertanyaan: {query}"
+                response = f"# Tidak ada informasi\n\nMaaf, saya tidak menemukan informasi yang relevan untuk pertanyaan: {query}"
+            else:
+                # Generate response
+                response = self.generate_response(query, results)
             
-            # Generate response
-            response = self.generate_response(query, results)
+            # Update markdown panel langsung
+            self.update_markdown_panel(response)
+            
             return response
             
         except Exception as e:
-            return f"# Error\n\nTerjadi kesalahan saat memproses query: {str(e)}"
+            error_msg = f"# Error\n\nTerjadi kesalahan saat memproses query: {str(e)}"
+            
+            # Update markdown panel dengan error
+            if self.markdown_viewer:
+                self.update_markdown_panel(error_msg)
+                
+            return error_msg

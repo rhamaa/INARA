@@ -13,8 +13,12 @@ from typing import Dict
 import flet as ft
 
 # Import modul-modul UI
-from ui.chat_box import RAGQueryPanel, LLMCommandPanel, CarouselPanel, DateTimePanel, AppColors
-from ui.md_panel import MarkdownViewer
+from ui.components import (
+    AppColors, AppStyles, 
+    RAGQueryPanel, LLMCommandPanel, 
+    CarouselPanel, DateTimePanel,
+    MarkdownViewer
+)
 
 # Import modul-modul backend
 from Function.tools.rag import SimpleRAG, RAG_AVAILABLE
@@ -148,23 +152,21 @@ class MarkdownApp:
         """
         if RAG_AVAILABLE:
             try:
-                # Inisialisasi RAG terlebih dahulu
-                self.rag = SimpleRAG()
+                # Hubungkan langsung dengan MarkdownViewer
+                self.rag = SimpleRAG(
+                    markdown_viewer=self.components["markdown_viewer"]
+                )
                 
                 # Buat status callback untuk UI panel
                 def status_callback(message: str):
                     if "rag_panel" in self.components:
                         self.components["rag_panel"].status_callback(message)
                 
-                # Buat callback untuk menerima hasil
-                def result_callback(response: str):
-                    self.components["markdown_viewer"].update_content(response)
-                
                 # Inisialisasi ChatManager
                 self.chat_manager = ChatManager(
                     rag_instance=self.rag,
                     status_callback=status_callback,
-                    result_callback=result_callback
+                    # Tidak perlu result_callback lagi karena RAG langsung update markdown
                 )
                 
                 # Handler untuk query dari UI
